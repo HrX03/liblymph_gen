@@ -1,0 +1,7 @@
+builders:
+  preferences_builder:
+    import: "package:liblymph_gen/builder.dart"
+    builder_factories: ["preferencesBuilder"]
+    build_extensions: {"^assets/data/preferences.json": ["lib/generated/preferences.dart"]}
+    auto_apply: dependents
+    build_to: source
