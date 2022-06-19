@@ -32,25 +32,22 @@ class PreferencesBuilder extends Builder {
 
     final List<String>? additionalImports =
         json.getOptionalList<String>("additionalImports");
+    final List<String> imports = [
+      "package:liblymph/providers.dart",
+      if (additionalImports != null) ...additionalImports,
+    ];
+    imports.sort((a, b) => a.compareTo(b));
+
     final LibraryBuilder generatedLibrary = LibraryBuilder();
-    generatedLibrary.directives.add(
-      Directive(
-        (b) => b
-          ..url = "package:liblymph/providers.dart"
-          ..type = DirectiveType.import,
+    generatedLibrary.directives.addAll(
+      imports.map(
+        (e) => Directive(
+          (b) => b
+            ..url = e
+            ..type = DirectiveType.import,
+        ),
       ),
     );
-    if (additionalImports != null) {
-      generatedLibrary.directives.addAll(
-        additionalImports.map(
-          (e) => Directive(
-            (b) => b
-              ..url = e
-              ..type = DirectiveType.import,
-          ),
-        ),
-      );
-    }
 
     final String? requestedClassName = json.getOptional<String>("className");
     final ClassBuilder generatedClass = ClassBuilder();
@@ -173,7 +170,7 @@ String _buildSimpleSetter(_JsonLocalPreference preference) {
 String _buildEnumGetter(String enumName, _JsonLocalPreference preference) {
   final StringBuffer buffer = StringBuffer();
   buffer.writeln(
-    'int? value = backend.${preference.type.backendGetMethod}("${preference.name}");',
+    'final int? value = backend.${preference.type.backendGetMethod}("${preference.name}");',
   );
 
   buffer.writeln('switch(value) {');
