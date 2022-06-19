@@ -52,7 +52,7 @@ class PreferencesBuilder extends Builder {
     final String? requestedClassName = json.getOptional<String>("className");
     final ClassBuilder generatedClass = ClassBuilder();
     generatedClass.name = requestedClassName ?? defaultClassName;
-    generatedClass.extend = refer('LocalPreferences');
+    generatedClass.extend = refer('LocalPreferences<TypedPreferencesBackend>');
     generatedClass.constructors.add(
       Constructor(
         (b) => b
@@ -62,7 +62,7 @@ class PreferencesBuilder extends Builder {
               (b) => b
                 ..required = true
                 ..name = 'backend'
-                ..type = refer('LocalPreferencesBackend')
+                ..type = refer('TypedPreferencesBackend')
                 ..named = true,
             ),
           )
@@ -151,7 +151,7 @@ class PreferencesBuilder extends Builder {
 String _buildSimpleGetter(_JsonLocalPreference preference) {
   final StringBuffer buffer = StringBuffer('return ');
   buffer.write(
-    'backend.${preference.type.backendGetMethod}("${preference.name}")',
+    'backend.read<${preference.type.nativeType}>("${preference.name}")',
   );
 
   if (preference.defaultValue != null) {
@@ -164,13 +164,25 @@ String _buildSimpleGetter(_JsonLocalPreference preference) {
 }
 
 String _buildSimpleSetter(_JsonLocalPreference preference) {
-  return 'backend.${preference.type.backendSetMethod}("${preference.name}", value);';
+  final StringBuffer buffer = StringBuffer();
+
+  buffer.writeln('if(value != null) {');
+  buffer.writeln(
+    'backend.write<${preference.type.nativeType}>("${preference.name}", value);',
+  );
+  buffer.writeln('} else {');
+  buffer.writeln(
+    'backend.delete("${preference.name}");',
+  );
+  buffer.writeln('}');
+
+  return buffer.toString();
 }
 
 String _buildEnumGetter(String enumName, _JsonLocalPreference preference) {
   final StringBuffer buffer = StringBuffer();
   buffer.writeln(
-    'final int? value = backend.${preference.type.backendGetMethod}("${preference.name}");',
+    'final int? value = backend.read<${preference.type.nativeType}>("${preference.name}");',
   );
 
   buffer.writeln('switch(value) {');
@@ -194,7 +206,7 @@ String _buildEnumSetter(String enumName, _JsonLocalPreference preference) {
   final StringBuffer buffer = StringBuffer();
   buffer.writeln('if(value == null) {');
   buffer.writeln(
-    'backend.${preference.type.backendSetMethod}("${preference.name}", null);',
+    'backend.delete("${preference.name}");',
   );
   buffer.writeln("return;");
   buffer.writeln("}");
@@ -212,7 +224,7 @@ String _buildEnumSetter(String enumName, _JsonLocalPreference preference) {
   buffer.writeln();
 
   buffer.writeln(
-    'backend.${preference.type.backendSetMethod}("${preference.name}", resolvedValue);',
+    'backend.write<${preference.type.nativeType}>("${preference.name}", resolvedValue);',
   );
 
   return buffer.toString();
@@ -314,22 +326,16 @@ Never _typeMismatchHandler<T>(dynamic value) {
 }
 
 enum _JsonLocalPreferenceType {
-  int('int', 'getInt', 'setInt'),
-  double('double', 'getDouble', 'setDouble'),
-  bool('bool', 'getBool', 'setBool'),
-  string('String', 'getString', 'setString'),
-  stringList('List<String>', 'getStringList', 'setStringList'),
-  enumerated('Enum', 'getInt', 'setInt');
+  int('int'),
+  double('double'),
+  bool('bool'),
+  string('String'),
+  stringList('List<String>'),
+  enumerated('int');
 
   final String nativeType;
-  final String backendGetMethod;
-  final String backendSetMethod;
 
-  const _JsonLocalPreferenceType(
-    this.nativeType,
-    this.backendGetMethod,
-    this.backendSetMethod,
-  );
+  const _JsonLocalPreferenceType(this.nativeType);
 }
 
 class MissingRequiredEntryException implements Exception {
