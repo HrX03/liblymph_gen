@@ -1,0 +1,21 @@
+name: liblymph_gen
+description: Code generator package for liblymph
+version: 1.0.0
+publish_to: 'none'
+
+environment:
+  sdk: '>=2.18.0-175.0.dev <3.0.0'
+
+
+dependencies:
+  build: ^2.3.0
+
+  code_builder: ^4.1.0
+
+  dart_style: ^2.2.3
+
+  recase: ^4.0.0
+
+dev_dependencies:
+  lints: ^2.0.0
+  test: ^1.16.0
