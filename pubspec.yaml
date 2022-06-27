@@ -6,7 +6,6 @@ publish_to: 'none'
 environment:
   sdk: '>=2.18.0-175.0.dev <3.0.0'
 
-
 dependencies:
   build: ^2.3.0
 
@@ -14,7 +13,15 @@ dependencies:
 
   dart_style: ^2.2.3
 
+  glob: ^2.1.0
+  path: ^1.8.2
   recase: ^4.0.0
+
+  xml: ^6.1.0
+  yatl:
+    git:
+      url: https://github.com/HrX03/yatl
+      path: yatl
 
 dev_dependencies:
   lints: ^2.0.0
