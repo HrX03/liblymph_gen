@@ -166,15 +166,14 @@ class LocaleBuilder extends Builder {
 
         classBuilder.methods.add(methodBuilder.build());
       } else {
-        final FieldBuilder fieldBuilder = FieldBuilder();
-        fieldBuilder.name = name;
-        if (info.comment != null) fieldBuilder.docs.add("/// ${info.comment}");
-        fieldBuilder.late = true;
-        fieldBuilder.modifier = FieldModifier.final$;
-        fieldBuilder.type = refer("String");
-        fieldBuilder.assignment = Code("core.translate(\"$key\")");
+        final MethodBuilder methodBuilder = MethodBuilder();
+        methodBuilder.name = name;
+        if (info.comment != null) methodBuilder.docs.add("/// ${info.comment}");
+        methodBuilder.type = MethodType.getter;
+        methodBuilder.returns = refer("String");
+        methodBuilder.body = Code("return core.translate(\"$key\");");
 
-        classBuilder.fields.add(fieldBuilder.build());
+        classBuilder.methods.add(methodBuilder.build());
       }
     });
 
