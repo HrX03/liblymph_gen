@@ -33,11 +33,11 @@ class LocaleBuilder extends Builder {
     for (final AssetId asset in assets) {
       final List<String> parts = asset.path.split("/");
 
-      final String fileName = parts[parts.length - 2].split("-").join("_");
+      final String fileName = parts[parts.length - 2];
 
       locales.add(fileName);
 
-      if (fileName != "en_US") continue;
+      if (fileName != "en-US") continue;
 
       final ParseResult? result = XmlFileParser.parse(
         await buildStep.readAsString(asset),
@@ -122,7 +122,7 @@ class LocaleBuilder extends Builder {
       final String category = keyParts.removeAt(0);
       final ClassBuilder classBuilder =
           stringClasses[category] ??= _buildBaseClass(category);
-      final String name = keyParts.join("_").camelCase;
+      final String name = keyParts.join("-").camelCase;
       final List<String> arguments = List.generate(
         info.argumentAmount,
         (index) => "arg$index",

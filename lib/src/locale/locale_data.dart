@@ -17,7 +17,7 @@ class LocaleDataBuilder extends Builder {
 
     final List<String> parts = buildStep.inputId.path.split("/");
 
-    final String fileName = parts[parts.length - 2].split("-").join("_");
+    final String fileName = parts[parts.length - 2];
 
     final AssetId outputId = AssetId(
       buildStep.inputId.package,
@@ -92,8 +92,8 @@ class LocaleDataBuilder extends Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => {
-        "^assets/data/locales/{{a}}-{{b}}/strings.xml": [
-          "lib/generated/locale/data/{{a}}_{{b}}.dart",
+        "^assets/data/locales/{{}}/strings.xml": [
+          "lib/generated/locale/data/{{}}.dart",
         ],
       };
 }
