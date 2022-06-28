@@ -147,7 +147,7 @@ class LocaleBuilder extends Builder {
               (e) => Parameter(
                 (p) => p
                   ..name = e
-                  ..type = refer("String"),
+                  ..type = refer("Object"),
               ),
             ),
           );
@@ -157,7 +157,7 @@ class LocaleBuilder extends Builder {
 
         if (!info.isPlural) {
           final String params =
-              "arguments: [${arguments.map((e) => e).join(",")}]";
+              "arguments: [${arguments.map((e) => "$e.toString()").join(",")}]";
           methodBuilder.body =
               Code("return core.translate(\"$key\",$params,);");
         } else {
